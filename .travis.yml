@@ -1,0 +1,42 @@
+language: cpp
+sudo: false
+dist: trusty
+compiler:
+- g++
+- gcc
+os:
+- linux
+
+before_install:
+- sudo apt-get install sfml -y
+- echo $LC_ALL
+
+before_script:
+
+script: 
+- make
+
+env:
+  global:
+  - LANG="en_US.UTF-8"
+
+matrix:
+  include:
+    - os: linux
+      env: COMPILER_NAME=gcc CXX=g++-11 CC=gcc-11
+      addons:
+        apt:
+          packages:
+            - g++-11
+          sources: &sources
+            - llvm-toolchain-trusty-3.8
+            - ubuntu-toolchain-r-test
+    - os: linux
+      env: COMPILER_NAME=gcc CXX=g++-14 CC=gcc-14
+      addons:
+        apt:
+          packages:
+            - g++-14
+          sources: &sources
+            - llvm-toolchain-trusty-3.8
+            - ubuntu-toolchain-r-test
