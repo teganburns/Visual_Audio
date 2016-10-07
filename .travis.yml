@@ -1,5 +1,5 @@
 language: cpp
-sudo: false
+
 dist: trusty
 compiler:
 - g++
@@ -8,7 +8,7 @@ os:
 - linux
 
 before_install:
-sudo apt-get install -y sfml
+apt-get install -y sfml
 
 
 before_script:
