@@ -8,8 +8,7 @@ os:
 - linux
 
 before_install:
-apt-get install -y sfml
-
+- apt-get install -y sfml
 
 before_script:
 
