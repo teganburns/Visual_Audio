@@ -8,8 +8,8 @@ os:
 - linux
 
 before_install:
-- sudo apt-get install sfml -y
-- echo $LC_ALL
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libxml2-dev
 
 before_script:
 
