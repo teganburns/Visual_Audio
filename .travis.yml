@@ -1,3 +1,7 @@
+notifications:
+    email: never
+sudo: required
+
 language: cpp
 
 dist: trusty
@@ -8,7 +12,7 @@ os:
 - linux
 
 before_install:
-- apt-get install -y sfml
+- sudo apt-get install -y sfml
 
 before_script:
 
