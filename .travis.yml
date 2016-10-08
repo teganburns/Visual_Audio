@@ -19,7 +19,7 @@ before_install:
 - cd SFML-2.4.0
 - sudo cp -r * /usr/
 - sudo cp -r * /usr/local/
-- echo done_copying
+- cd ..
 
 before_script:
 
