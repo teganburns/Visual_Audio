@@ -20,7 +20,9 @@ before_install:
 - sudo cp -r * /usr/
 - sudo cp -r * /usr/local/
 - cd ..
+- ld
 
+ 
 before_script:
 
 script: 
