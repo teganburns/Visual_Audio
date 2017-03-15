@@ -54,8 +54,8 @@ public:
 
 int main()
 {
-    int window_height = 1;
-    int window_width = 1;
+    int window_height = 1080;
+    int window_width = 1920;
 
     std::vector<string> list;
     std::string s;
@@ -83,7 +83,7 @@ int main()
     //window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(9);
 
-    std::size_t sc = 1600; // initallize it till it get a real value
+    std::size_t sc = 16000; // initallize it till it get a real value
 
     sf::Vector2u size = window.getSize();
     window_width = size.x;
@@ -95,7 +95,7 @@ int main()
     while (window.isOpen())
     {
 
-	//cout << "Sample Count: " << sc << "        HxW: " << window_height << " " << window_width << "  More shit: " << float(float(window_width) / float(sc)) * 1600 << endl;
+	cout << "Sample Count: " << sc << "        HxW: " << window_height << " " << window_width << "  More shit: " << float(float(window_width) / float(sc)) * 1600 << endl;
 	sc = recorder.sc;
 	sf::VertexArray line(sf::LineStrip, sc);
 	//line[0].position = sf::Vector2f((window_height / 2 ) + (window_width / 2))
@@ -103,7 +103,7 @@ int main()
         for (int i = 1; i < int(sc); i++)
         {
             x = int( float(float(window_width) / float(sc)) * i);
-            y = int(window_height / 2) + (*recorder.sample++ / 25);
+            y = int(window_height / 2) + (*recorder.sample++ / 25 );
             line[i].position = sf::Vector2f( x, y);
             line[i].color = sf::Color::Red;
         }
