@@ -1,5 +1,4 @@
 # Visual_Audio
-[![Build Status](https://travis-ci.org/teganburns/Visual_Audio.svg?branch=master)](https://travis-ci.org/teganburns/Visual_Audio)
 
 This program uses SFML libraries(2.4). [SFML Main Website](http://www.sfml-dev.org/) [SFML Git repo](https://github.com/SFML/SFML)
 
