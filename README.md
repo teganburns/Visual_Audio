@@ -1,12 +1,32 @@
 # Visual_Audio
+Program written in C++ for Visualising realtime audio input using SFML.
 
-This program uses SFML libraries(2.4). [SFML Main Website](http://www.sfml-dev.org/) [SFML Git repo](https://github.com/SFML/SFML)
+Scaling Frequencies
 
-### Setup
+![](https://github.com/teganburns/Visual_Audio/blob/master/media/tones.gif?raw=true)
 
-Pro tip: If you are running Glorious Arch Linux you can install SFML via pacman
+With Audio: https://youtu.be/YEwBG1RGalw
 
-$ sudo pacman -S sfml
+Speech
+
+![](https://github.com/teganburns/Visual_Audio/blob/master/media/speech.gif?raw=true)
+"In a world of infinite possibilities, ask not if, but when."
+
+With Audio: https://youtu.be/GPYSKtAhaqc
+
+
+## Prerequisites
+
+- SFML
+This program uses SFML libraries(2.4). [SFML Main Website](http://www.sfml-dev.org/) [SFML Git repo](https://github.com/SFML/SFML). SFML can be found in most Linux distribution's package repository.
 
 Otherwise check [SFML's Download page](http://www.sfml-dev.org/download.php) for the deets.
+
+- GCC Make
+
+## Build
+
+`cd Visual_Audio && make`
+
+
 
