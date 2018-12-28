@@ -1,10 +1,11 @@
 #include <iostream>
 #include <unistd.h>
+#include <chrono>
+#include <thread>
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/System.hpp>
-
 
 #include <numeric>
 #include <fstream>
@@ -15,75 +16,60 @@
 using namespace std;
 
 
-class MyRecorder : public sf::SoundRecorder
-{
-    virtual bool onStart()
-    {
-        cout << "Recorder Started" << endl;
+int main(int argc, const char *argv[]) {
 
-        return true;
-    }
+    // Argument check
+    if ( argc < 2 ) { std::cout << "Please provice an audio file" << std::endl; }
 
-    virtual bool onProcessSamples(const sf::Int16* samples, std::size_t sampleCount )
-    {
-        // Do something useful with samples
-        sc = sampleCount;
-        sample = samples;
-
-        // Return true to continue false to stop
-        return true;
-    }
-
-    virtual void onStop()
-    {
-        // Clean up here if necessary
-        cout << "Recorder Stoped" << endl;
-    }
-
-
-
-public:
-
-    std::size_t sc;
-    const sf::Int16* sample;
-
-};
-
-
-
-
-int main()
-{
+    // Variables
+    int x, y;
     int window_height = 1080;
     int window_width = 1920;
+    int frame_rate = 30;
 
     std::vector<string> list;
     std::string s;
-    unsigned int sampleRate = 16000; //44100
 
-    int x;
-    int y;
+    const sf::Int16* sample_buffer;
+    uint64_t sample_count;
+    unsigned int sample_rate;
+    unsigned int channel_count;
+    int32_t duration_milliseconds; // Note: One second = 1000 milliseconds
 
+    int samples_per_frame;
 
-    if (!MyRecorder::isAvailable())
-    {
-        cerr << "Error: Audio Device not aviable" << endl;
-        return -1;
-    }
+    std::chrono::system_clock::time_point tp;
 
-    MyRecorder recorder;
-    if (!recorder.start(sampleRate))
-    {
-        cerr << "Error starting recorder" << endl;
-        return -1;
-    }
+    // Start
+    sf::SoundBuffer sb;
+    sb.loadFromFile( argv[1] );
 
-    // create the window
+    sf::Sound sound;
+    sound.setBuffer( sb );
+
+    // Get Buffer Info
+    sample_buffer = sb.getSamples();
+    sample_count = sb.getSampleCount();
+    sample_rate = sb.getSampleRate();
+    channel_count = sb.getChannelCount();
+    duration_milliseconds = sb.getDuration().asMilliseconds();
+
+    samples_per_frame = sample_rate / frame_rate;
+    
+    std::cout << "file: " << argv[1] << std::endl;
+    std::cout << "sample_count: " << sample_count << std::endl;
+    std::cout << "sample_rate: " << sample_rate << std::endl;
+    std::cout << "channel_count: " << channel_count << std::endl;
+    std::cout << "duration_milliseconds: " << duration_milliseconds << std::endl;
+    std::cout << "samples_per_frame: " << samples_per_frame << std::endl;
+
+    // Exit if more than one channel
+    if ( channel_count > 1 ) { std::cout << "Not designed to handle more than one channel" << std::endl; return 0; }
+
+    // Create Window
     sf::RenderWindow window(sf::VideoMode(window_width, window_height), "Audio Visualizer");
     //window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(9);
-
-    std::size_t sc = 16000; // initallize it till it get a real value
+    //window.setFramerateLimit(60);
 
     sf::Vector2u size = window.getSize();
     window_width = size.x;
@@ -91,27 +77,30 @@ int main()
 
     sleep(0.2);
 
+    sound.play();
+
     // run the program as long as the window is open
-    while (window.isOpen())
-    {
+    while ( window.isOpen() ) {
 
-	cout << "Sample Count: " << sc << "        HxW: " << window_height << " " << window_width << "  More shit: " << float(float(window_width) / float(sc)) * 1600 << endl;
-	sc = recorder.sc;
-	sf::VertexArray line(sf::LineStrip, sc);
-	//line[0].position = sf::Vector2f((window_height / 2 ) + (window_width / 2))
+        // Get Start Time of Loop
+        tp = std::chrono::system_clock::now();
 
-        for (int i = 1; i < int(sc); i++)
-        {
-            x = int( float(float(window_width) / float(sc)) * i);
-            y = int(window_height / 2) + (*recorder.sample++ / 25 );
+
+        sf::VertexArray line(sf::LineStrip, samples_per_frame );
+        ///line[0].position = sf::Vector2f((window_height / 2 ) + (window_width / 2))
+
+        for (int i = 1; i < samples_per_frame; i++) {
+
+            x = int( float(float(window_width) / float( samples_per_frame )) * i);
+            y = int(window_height / 2) + (*sample_buffer++ / 25 );
             line[i].position = sf::Vector2f( x, y);
             line[i].color = sf::Color::Red;
         }
 
         // check all the window's events that were triggered since the last iteration of the loop
         sf::Event event;
-        while (window.pollEvent(event))
-        {
+        while ( window.pollEvent(event) ) {
+
             // "close requested" event: we close the window
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -121,16 +110,34 @@ int main()
         // clear the window with black color
         window.clear(sf::Color::Black);
 
-
         window.draw(line);
 
         // end the current frame
         window.display();
+
+        // Calculate how much time has elapsed
+        std::chrono::duration< double > time_span = std::chrono::duration_cast< std::chrono::duration< double > > ( std::chrono::system_clock::now() - tp );
+        std::cout << "time_span ns: " << std::chrono::duration_cast< std::chrono::nanoseconds >( time_span ).count() << std::endl;
+
+        // Calculate when frame is supposed to end
+        //std::chrono::system_clock::time_point frame_duration = tp + std::chrono::seconds( 1 / frame_rate );
+        std::chrono::duration< int, std::ratio<1,30 > > frame_duration (1);
+        std::chrono::system_clock::time_point frame_end = tp + std::chrono::duration_cast< std::chrono::nanoseconds > ( frame_duration );
+
+        // Calculate how much time to sleep for
+        std::chrono::duration< double > time_sleep = std::chrono::duration_cast< std::chrono::duration< double > > ( frame_end - std::chrono::system_clock::now() );
+        std::cout << "time_sleep ns: " << std::chrono::duration_cast< std::chrono::nanoseconds >( time_sleep ).count() << std::endl;
+
+        // Sleep the rest of the frame duration
+        std::this_thread::sleep_for( time_sleep );
+
     }
 
 
-    recorder.stop();
+    sound.stop();
 
 
 	return 0;
 }
+
+
